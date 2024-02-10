@@ -5,7 +5,7 @@ from pydub import AudioSegment
 from openai import OpenAI
 
 # Make sure to replace "your_api_key" with your actual OpenAI API key
-client = OpenAI(api_key = "sk-w73bLRGDTh4vrKj8JxYqT3BlbkFJgcTMJx0KbNDrjYPhNq")
+client = OpenAI(api_key = "sk-rzg3rnGB6YNhHo6hyKodT3BlbkFJ7Sg69CpcVuquzVe")
 
 def get_transcription_from_whisper():
     # Set the audio parameters
@@ -82,9 +82,41 @@ def get_transcription_from_whisper():
         )
 
     # Return the transcript text
-    return transcript.text
+    to_dispaly = transcript.text
+    from signal import signal, SIGTERM, SIGHUP, pause
+    from rpi_lcd import LCD
+
+    lcd = LCD()
+
+    def safe_exit(signum,frame):
+            exit(1)
+
+    signal(SIGTERM, safe_exit)
+    signal(SIGHUP, safe_exit)
+
+    def display_transcription(transcription):
+        try:
+            max_line_length = 16  # Adjust the maximum characters per line as needed
+            lines = [transcription[i:i + max_line_length] for i in range(0, len(transcription), max_line_length)]
+            
+            for i, line in enumerate(lines, start=1):
+                lcd.text(f"{line}", i)
+            
+            pause()
+        except KeyboardInterrupt:
+            pass
+        finally:
+            lcd.clear()
+
+
+    display_transcription(to_dispaly)
+
+
 
 # Example usage of the function
 if __name__ == '__main__':
     transcription = get_transcription_from_whisper()
     print("Transcript:", transcription)
+
+
+

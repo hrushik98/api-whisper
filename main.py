@@ -1,16 +1,13 @@
 import os
 import numpy as np
 import pyaudio
-import wave
 from pydub import AudioSegment
 from openai import OpenAI
-client = OpenAI(api_key =  "sk-VhYd1XhAFU4CXXjdHQRHT3BlbkFJg17erB5Pt9CgwkYwPr)
 
-
+# Make sure to replace "your_api_key" with your actual OpenAI API key
+client = OpenAI(api_key = "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")
 
 def get_transcription_from_whisper():
-
-
     # Set the audio parameters
     FORMAT = pyaudio.paInt16
     CHANNELS = 1
@@ -38,11 +35,11 @@ def get_transcription_from_whisper():
         data = stream.read(CHUNK)
         frames.append(data)
         total_frames += 1
-        
+
         # Convert audio chunks to integers
         audio_data = np.frombuffer(data, dtype=np.int16)
-        
-        # Check if user has started speaking
+
+        # Check if the user has started speaking
         if np.abs(audio_data).mean() > SILENCE_THRESHOLD:
             is_speaking = True
 
@@ -54,7 +51,7 @@ def get_transcription_from_whisper():
                 silence_frames = 0
 
         # End of speech detected
-        if is_speaking and silence_frames > SPEECH_END_TIME * (RATE / CHUNK):
+        if is_speaking and silence_frames > int(SPEECH_END_TIME * (RATE / CHUNK)):
             print("End of speech detected.")
             break
 
@@ -77,17 +74,15 @@ def get_transcription_from_whisper():
     # Export as a compressed MP3 file with a specific bitrate
     audio_segment.export("output_audio_file.mp3", format="mp3", bitrate="32k")
 
-    audio_file = open("output_audio_file.mp3", "rb")
-    transcript = client.audio.transcriptions.create(
-    model="whisper-1",
-    file=audio_file
-    )
+    # It's a good practice to close the file after reading
+    with open("output_audio_file.mp3", "rb") as audio_file:
+        transcript = client.audio.transcriptions.create(
+            model="whisper-1",
+            file=audio_file
+        )
+
     # Return the transcript text
     return transcript.text
-
-
-
-
 
 # Example usage of the function
 if __name__ == '__main__':

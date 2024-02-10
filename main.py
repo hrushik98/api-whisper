@@ -5,7 +5,7 @@ from pydub import AudioSegment
 from openai import OpenAI
 
 # Make sure to replace "your_api_key" with your actual OpenAI API key
-client = OpenAI(api_key = "sk-")
+client = OpenAI(api_key = "sk-w73bLRGDTh4vrKj8JxYqT3BlbkFJgcTMJx0KbNDrjYPhNq")
 
 def get_transcription_from_whisper():
     # Set the audio parameters
